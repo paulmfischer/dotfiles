@@ -1,0 +1,70 @@
+[user]
+	name = Paul Fischer
+	email = paul.fischer@ilmservice.com
+
+[diff]
+	tool = bc3
+
+[difftool "bc3"]
+	path = c:/Program Files (x86)/Beyond Compare 3/bcomp.exe
+
+[merge]
+	tool = bc3
+
+[mergetool "bc3"]
+	path = c:/Program Files (x86)/Beyond Compare 3/bcomp.exe
+
+[difftool]
+	prompt = false
+
+[core]
+	editor = 'C:/Program Files (x86)/Notepad++/notepad++.exe' -multiInst -notabbar -nosession -noPlugin
+
+[push]
+	default = simple
+
+[alias]
+	# Get the current branch name (not so useful in itself, but used in other aliases)
+	branch-name = "!git rev-parse --abbrev-ref HEAD"
+
+	# Push the current branch to the remote "origin", and set it to track the upstream branch
+	publish = "!git push -u origin $(git branch-name)"
+
+	# Only push if the remote branch does not have any changes
+	please = push --force-with-lease
+
+	# Fancy cli graph of commits.
+	grog = log --graph --abbrev-commit --decorate --all --format=format:\"%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(dim white) - %an%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n %C(white)%s%C(reset)\"
+
+	# Fire up your difftool (e.g. Kaleidescope) with all the changes that are on the current branch.
+	code-review = difftool origin/master...
+
+	# diff changes as well as staged changes.
+	stage-diff = difftool --cached
+
+	# delete all branches except master and branch that i am on
+	#cleanup = "!git branch | egrep -v "(master|\*)" | xargs git branch -D"
+
+	# shorthand interactive rebase, just pass number of commits
+	rb = "!sh -c \"git rebase -i HEAD~$1\" -"
+
+	# shorthand for difftool
+	dft = difftool
+
+	# Add all
+	ad = add -A
+
+	# commit with message
+	cm = commit -m
+
+	# commit and add with message
+	cam = commit -am
+
+	# shorthand for status
+	st = status
+
+	# fetch latest from origin
+	fo = fetch origin
+
+	# rebase origin/master on the current branch
+	rom = rebase origin/master
