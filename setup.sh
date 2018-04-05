@@ -1,17 +1,25 @@
 #!/bin/bash
 
-# pull in vim color
 dir=$PWD
-echo $dir
+
+# pull in vim color
 cd ~
-mkdir .vim
-cd .vim
-mkdir colors
-cd colors
+
+if [ ! -d ".vim/colors" ]; then
+  mkdir -p .vim/colors
+fi
+
+cd .vim/colors
 curl -O https://raw.githubusercontent.com/morhetz/gruvbox/master/colors/gruvbox.vim
-cd $dir
+
+# pull down tmux setup
+cd ~
+git clone https://github.com/gpakosz/.tmux.git
+ln -s -f .tmux/.tmux.conf
+cp .tmux/.tmux.conf.local .
 
 # copy over dot files
+cd $dir
 cp .bashrc ~/.bashrc
 cp .bash_aliases ~/.bash_aliases
 cp .gitconfig ~/.gitconfig
