@@ -29,5 +29,11 @@ cp .bash_aliases ~/.bash_aliases
 cp .gitconfig ~/.gitconfig
 cp .vimrc ~/.vimrc
 
+# change diff/merge tool to work with beyond compare 3 properly in linux
+#git config --global diff.tool bc3
+#git config --global difftool.bc3.trustExitCode true
+#git config --global merge.tool bc3
+#git config --global mergetool.bc3.trustExitCode true
+
 # reload bashrc
 . ~/.bashrc
