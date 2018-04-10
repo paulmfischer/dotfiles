@@ -30,10 +30,12 @@ cp .gitconfig ~/.gitconfig
 cp .vimrc ~/.vimrc
 
 # change diff/merge tool to work with beyond compare 3 properly in linux
-#git config --global diff.tool bc3
-#git config --global difftool.bc3.trustExitCode true
-#git config --global merge.tool bc3
-#git config --global mergetool.bc3.trustExitCode true
+if [ "$1" = "nix" ]; then
+  git config --global diff.tool bc3
+  git config --global difftool.bc3.trustExitCode true
+  git config --global merge.tool bc3
+  git config --global mergetool.bc3.trustExitCode true
+fi
 
 # reload bashrc
 . ~/.bashrc
