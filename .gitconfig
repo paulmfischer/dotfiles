@@ -50,6 +50,9 @@
 
 	# shorthand interactive rebase, just pass number of commits
 	rb = "!sh -c \"git rebase -i HEAD~$1\" -"
+	
+	# shorthand for rebase --continue
+	rbc = rebase --continue
 
 	# shorthand for difftool
 	dft = difftool
