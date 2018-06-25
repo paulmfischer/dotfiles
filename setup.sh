@@ -33,8 +33,10 @@ cp .vimrc ~/.vimrc
 if [ "$1" = "nix" ]; then
   git config --global core.editor vim
   git config --global diff.tool bc3
+  git config --global --unset difftool.bc3.path
   git config --global difftool.bc3.trustExitCode true
   git config --global merge.tool bc3
+  git config --global --unset mergetool.bc3.path
   git config --global mergetool.bc3.trustExitCode true
 fi
 
