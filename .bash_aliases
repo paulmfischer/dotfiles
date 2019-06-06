@@ -15,9 +15,9 @@ fi
 
 # Some shortcuts for different directory listings
 alias ls='ls -hF --color=tty'                 # classify files in colour
-alias ll='ls -al'                              # long list
-alias la='ls -A'                              # all but . and ..
-alias l='ls -CF'                              #
+alias ll='ls -lhA --color=tty'                # long list
+alias la='ls -A --color=tty'                  # all but . and ..
+alias lsl='ls -lhFA | less --color=tty'       # long list with paging
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert

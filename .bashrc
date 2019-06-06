@@ -40,28 +40,50 @@ case "$TERM" in
     xterm-color|*-256color) color_prompt=yes;;
 esac
 
-# uncomment for a colored prompt, if the terminal has the capability; turned
-# off by default to not distract the user: the focus in a terminal window
-# should be on the output of commands, not on the prompt
-force_color_prompt=yes
+# test code for checking running environment: git bash, linux, etc.
+# unameOut="$(uname -s)"
+# case "${unameOut}" in
+#     Linux*)     machine=Linux;;
+#     Darwin*)    machine=Mac;;
+#     CYGWIN*)    machine=Cygwin;;
+#     MINGW*)     machine=MinGw;;
+#     *)          machine="UNKNOWN:${unameOut}"
+# esac
+# echo ${machine}
 
-if [ -n "$force_color_prompt" ]; then
-    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-	# We have color support; assume it's compliant with Ecma-48
-	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-	# a case would tend to support setf rather than setaf.)
-	color_prompt=yes
-    else
-	color_prompt=
+# if [ "${machine}" = "MinGw" ] || [ "${machine}" = "Cygwin" ]; then
+#   echo "git bash!"
+# else
+#   echo "not git bash"
+# fi
+
+# check if colrm command exists and only then update the prompt.
+if [ hash colrm 2>/dev/null ]; then
+    # uncomment for a colored prompt, if the terminal has the capability; turned
+    # off by default to not distract the user: the focus in a terminal window
+    # should be on the output of commands, not on the prompt
+    force_color_prompt=yes
+
+    if [ -n "$force_color_prompt" ]; then
+        if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+        # We have color support; assume it's compliant with Ecma-48
+        # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+        # a case would tend to support setf rather than setaf.)
+        color_prompt=yes
+        else
+        color_prompt=
+        fi
     fi
-fi
 
-if [ "$color_prompt" = yes ]; then
-   PS1="${debian_chroot:+($debian_chroot)}\[\033[36m\]\u\[\033[m\]\[\033[32m\] \[\033[33;1m\]\w\[\033[m\] \[\033[33m\](\$(git branch 2>/dev/null | grep '^*' | colrm 1 2))\[\033[m\] \$ "
+    if [ "$color_prompt" = yes ]; then
+    PS1="${debian_chroot:+($debian_chroot)}\[\033[36m\]\u\[\033[m\]\[\033[32m\] \[\033[33;1m\]\w\[\033[m\] \[\033[33m\](\$(git branch 2>/dev/null | grep '^*' | colrm 1 2))\[\033[m\] \$ "
+    else
+    PS1="${debian_chroot:+($debian_chroot)}\u \w\ (\$(git branch 2>/dev/null | grep '^*' | colrm 1 2)) \$ "
+    fi
+    unset color_prompt force_color_prompt
 else
-   PS1="${debian_chroot:+($debian_chroot)}\u \w\ (\$(git branch 2>/dev/null | grep '^*' | colrm 1 2)) \$ "
+  echo 'colrm does not exists'
 fi
-unset color_prompt force_color_prompt
 
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in
