@@ -74,3 +74,6 @@
 
 	# rebase origin/master on the current branch
 	rom = rebase origin/master
+	
+	# shorthand for displaying git log output as oneline
+	lone = log --oneline
