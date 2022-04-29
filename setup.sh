@@ -24,7 +24,7 @@ fi
 
 # copy over dot files
 cd $dir
-cp .bashrc ~/.bashrc
+# cp .bashrc ~/.bashrc
 cp .bash_aliases ~/.bash_aliases
 cp .gitconfig ~/.gitconfig
 cp .vimrc ~/.vimrc
