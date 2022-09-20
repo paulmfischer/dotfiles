@@ -13,14 +13,6 @@ fi
 cd .vim/colors
 curl -O https://raw.githubusercontent.com/morhetz/gruvbox/master/colors/gruvbox.vim
 
-# pull down tmux setup if it doesn't exist
-if [ ! -f "~/.tmux.conf" ]; then
-  echo ".tmux.conf does not exist, pulling down config"
-  cd ~
-  git clone https://github.com/gpakosz/.tmux.git
-  ln -s -f .tmux/.tmux.conf
-  cp .tmux/.tmux.conf.local .
-fi
 
 # copy over dot files
 cd $dir
@@ -31,6 +23,15 @@ cp .vimrc ~/.vimrc
 
 # change diff/merge tool to work with beyond compare 3 properly in linux
 if [ "$1" = "nix" ]; then
+  # pull down tmux setup if it doesn't exist
+  if [ ! -f "~/.tmux.conf" ]; then
+    echo ".tmux.conf does not exist, pulling down config"
+    cd ~
+    git clone https://github.com/gpakosz/.tmux.git
+    ln -s -f .tmux/.tmux.conf
+    cp .tmux/.tmux.conf.local .
+  fi
+
   git config --global core.editor vim
   git config --global diff.tool bc3
   git config --global --unset difftool.bc3.path
