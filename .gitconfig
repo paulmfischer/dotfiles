@@ -61,10 +61,10 @@
 	ad = add -A
 
 	# commit with message
-	cm = commit -m
+	cm = commit -S -m
 
 	# commit and add with message
-	cam = commit -am
+	cam = commit -S -am
 
 	# shorthand for status
 	st = status
