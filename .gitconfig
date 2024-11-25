@@ -23,6 +23,9 @@
 [push]
 	default = simple
 
+[fetch]
+	prune = true
+
 [alias]
 	# Get the current branch name (not so useful in itself, but used in other aliases)
 	branch-name = "!git rev-parse --abbrev-ref HEAD"
