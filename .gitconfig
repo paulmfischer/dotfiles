@@ -1,6 +1,7 @@
 [user]
 	name = Paul Fischer
 	email = me@paulmfischer.dev
+	signingkey = /home/[replace-me]
 
 [diff]
 	tool = bc3
@@ -80,3 +81,14 @@
 	
 	# shorthand for displaying git log output as oneline
 	lone = log --oneline
+
+[gpg]
+	format = ssh
+[core]
+	editor = vim
+[commit]
+	gpgsign = true
+[fetch]
+	prune = true
+[init]
+	defaultBranch = main
