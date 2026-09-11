@@ -22,3 +22,7 @@ alias lsl='ls -lhFA | less --color=tty'       # long list with paging
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
+# alias v='nvim'
+# alias vb='NVIM_APPNAME=nvim-basic nvim'
+# alias vf='NVIM_APPNAME=nvim-full nvim'

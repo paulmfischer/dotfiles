@@ -40,59 +40,56 @@ case "$TERM" in
     xterm-color|*-256color) color_prompt=yes;;
 esac
 
-# test code for checking running environment: git bash, linux, etc.
-# unameOut="$(uname -s)"
-# case "${unameOut}" in
-#     Linux*)     machine=Linux;;
-#     Darwin*)    machine=Mac;;
-#     CYGWIN*)    machine=Cygwin;;
-#     MINGW*)     machine=MinGw;;
-#     *)          machine="UNKNOWN:${unameOut}"
-# esac
-# echo ${machine}
+# uncomment for a colored prompt, if the terminal has the capability; turned
+# off by default to not distract the user: the focus in a terminal window
+# should be on the output of commands, not on the prompt
+#force_color_prompt=yes
 
-# if [ "${machine}" = "MinGw" ] || [ "${machine}" = "Cygwin" ]; then
-#   echo "git bash!"
-# else
-#   echo "not git bash"
-# fi
-
-# check if colrm command exists and only then update the prompt.
-if [ hash colrm 2>/dev/null ]; then
-    # uncomment for a colored prompt, if the terminal has the capability; turned
-    # off by default to not distract the user: the focus in a terminal window
-    # should be on the output of commands, not on the prompt
-    force_color_prompt=yes
-
-    if [ -n "$force_color_prompt" ]; then
-        if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-        # We have color support; assume it's compliant with Ecma-48
-        # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-        # a case would tend to support setf rather than setaf.)
-        color_prompt=yes
-        else
-        color_prompt=
-        fi
-    fi
-
-    if [ "$color_prompt" = yes ]; then
-    PS1="${debian_chroot:+($debian_chroot)}\[\033[36m\]\u\[\033[m\]\[\033[32m\] \[\033[33;1m\]\w\[\033[m\] \[\033[33m\](\$(git branch 2>/dev/null | grep '^*' | colrm 1 2))\[\033[m\] \$ "
+if [ -n "$force_color_prompt" ]; then
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+	# We have color support; assume it's compliant with Ecma-48
+	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+	# a case would tend to support setf rather than setaf.)
+	color_prompt=yes
     else
-    PS1="${debian_chroot:+($debian_chroot)}\u \w\ (\$(git branch 2>/dev/null | grep '^*' | colrm 1 2)) \$ "
+	color_prompt=
     fi
-    unset color_prompt force_color_prompt
-else
-  echo 'colrm does not exists'
 fi
+
+parse_git_branch() {
+ git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+}
+
+if [ "$color_prompt" = yes ]; then
+	PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h(\t)\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\] $(parse_git_branch)\$ '
+else
+	PS1='${debian_chroot:+($debian_chroot)}\u@\h(\t):\w$(parse_git_branch)\$ '
+fi
+unset color_prompt force_color_prompt
 
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in
 xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\W\a\]$PS1"
+    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
     ;;
 *)
     ;;
 esac
+
+# enable color support of ls and also add handy aliases
+# if [ -x /usr/bin/dircolors ]; then
+    # test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    # alias ls='ls --color=auto'
+    #alias dir='dir --color=auto'
+    #alias vdir='vdir --color=auto'
+
+    # alias grep='grep --color=auto'
+    # alias fgrep='fgrep --color=auto'
+    # alias egrep='egrep --color=auto'
+# fi
+
+# colored GCC warnings and errors
+#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
 # Alias definitions.
 # You may want to put all your additions into a separate file like
@@ -113,7 +110,9 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-export http_proxy=''
-export https_proxy=''
-export ftp_proxy=''
-export socks_proxy=''
+export PATH="$HOME/.local/bin:$PATH"
+
+# Machine-specific overrides (not tracked in dotfiles repo)
+if [ -f ~/.bashrc.local ]; then
+    . ~/.bashrc.local
+fi
