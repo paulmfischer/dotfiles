@@ -1,31 +1,40 @@
 [user]
 	name = Paul Fischer
 	email = me@paulmfischer.dev
-	signingkey = /home/[replace-me]
+	# GPG signing subkey ID is machine-specific — replace with this
+	# machine's own signing subkey (gpg --list-secret-keys --keyid-format=long)
+	signingkey = REPLACE_WITH_SIGNING_SUBKEY_ID
 
 [diff]
 	tool = bc3
 
 [difftool "bc3"]
-	path = c:/Program Files (x86)/Beyond Compare 3/bcomp.exe
+	trustExitCode = true
 
 [merge]
 	tool = bc3
 
 [mergetool "bc3"]
-	path = c:/Program Files (x86)/Beyond Compare 3/bcomp.exe
+	trustExitCode = true
 
 [difftool]
 	prompt = false
 
-[core]
-	editor = 'C:/Program Files (x86)/Notepad++/notepad++.exe' -multiInst -notabbar -nosession -noPlugin
+#[core]
+#	editor = 'C:/Program Files (x86)/Notepad++/notepad++.exe' -multiInst -notabbar -nosession -noPlugin
 
+[init]
+	defaultBranch = main
 [push]
 	default = simple
-
 [fetch]
 	prune = true
+[core]
+	editor = vim
+[commit]
+	gpgsign = true
+[tag]
+	gpgSign = true
 
 [alias]
 	# Get the current branch name (not so useful in itself, but used in other aliases)
@@ -82,13 +91,11 @@
 	# shorthand for displaying git log output as oneline
 	lone = log --oneline
 
-[gpg]
-	format = ssh
-[core]
-	editor = vim
-[commit]
-	gpgsign = true
-[fetch]
-	prune = true
-[init]
-	defaultBranch = main
+    # switch to branch and pull
+    bp = "!sh -c \"git switch $1 && git pull\" -"
+
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
