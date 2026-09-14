@@ -70,7 +70,7 @@ link_with_stow() {
 }
 
 copy_fallback() {
-    echo "Git Bash detected - copying files instead of symlinking."
+    echo "Copying files into \$HOME instead of symlinking."
     local file rel target
     while IFS= read -r -d '' file; do
         rel="${file#"$pkg_dir"/}"
@@ -81,6 +81,7 @@ copy_fallback() {
 }
 
 if is_git_bash; then
+    echo "Git Bash detected - symlinks aren't reliable here."
     copy_fallback
 elif install_stow; then
     link_with_stow
