@@ -8,6 +8,12 @@ case $- in
       *) return;;
 esac
 
+# guard against being sourced twice (e.g. via .profile below)
+if [ -n "$DOTFILES_BASHRC_LOADED" ]; then
+    return
+fi
+export DOTFILES_BASHRC_LOADED=1
+
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth
@@ -115,4 +121,10 @@ export PATH="$HOME/.local/bin:$PATH"
 # Machine-specific overrides (not tracked in dotfiles repo)
 if [ -f ~/.bashrc.local ]; then
     . ~/.bashrc.local
+fi
+
+# pick up .profile env for non-login shells (e.g. a new terminal tab, or
+# WSL's default terminal invocation, neither of which read .profile on their own)
+if [ -z "$DOTFILES_PROFILE_LOADED" ] && [ -f ~/.profile ]; then
+    . ~/.profile
 fi
