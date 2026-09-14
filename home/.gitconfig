@@ -1,9 +1,10 @@
 [user]
 	name = Paul Fischer
 	email = me@paulmfischer.dev
-	# GPG signing subkey ID is machine-specific — replace with this
-	# machine's own signing subkey (gpg --list-secret-keys --keyid-format=long)
-	signingkey = REPLACE_WITH_SIGNING_SUBKEY_ID
+
+# Machine-specific signing key (not tracked in dotfiles repo)
+[include]
+	path = ~/.gitconfig.local
 
 [diff]
 	tool = bc3

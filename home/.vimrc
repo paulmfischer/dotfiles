@@ -34,7 +34,7 @@ set expandtab               " Expand tabs to spaces. Essential in Python.
 set tabstop=4               " Number of spaces tab is counted for.
 set shiftwidth=4            " Number of spaces to use for autindent.
 
-colorscheme unokai          " change colorscheme
+colorscheme gruvbox         " change colorscheme
 
 " => Chapter 2: Advanced Movement and Navigation
 

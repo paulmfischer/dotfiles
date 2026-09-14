@@ -1,45 +1,112 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Bootstraps this machine from the dotfiles repo.
+#
+# On Linux (incl. WSL): installs GNU Stow if missing, backs up any
+# conflicting pre-existing files, then symlinks everything under home/
+# into $HOME via stow. Because it's a symlink, future edits to files in
+# $HOME are edits to the repo - no separate "copy back" step needed.
+#
+# On Git Bash / native Windows: symlinks aren't reliably available
+# without admin rights, so files are copied instead. Re-run this script
+# after pulling repo changes to refresh the copies.
+set -euo pipefail
 
-dir=$PWD
+repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+pkg_dir="$repo_dir/home"
+backup_dir="$HOME/.dotfiles-backup-$(date +%Y%m%d%H%M%S)"
 
-# pull in vim color
-echo "pull in gruvbox.vim color"
-cd ~
+is_git_bash() {
+    [ -n "${MSYSTEM:-}" ]
+}
 
-if [ ! -d ".vim/colors" ]; then
-  mkdir -p .vim/colors
+install_stow() {
+    if command -v stow >/dev/null 2>&1; then
+        return 0
+    fi
+    echo "GNU Stow not found."
+    if command -v apt-get >/dev/null 2>&1; then
+        echo "Installing stow via apt-get (requires sudo)..."
+        sudo apt-get update && sudo apt-get install -y stow
+    elif command -v dnf >/dev/null 2>&1; then
+        echo "Installing stow via dnf (requires sudo)..."
+        sudo dnf install -y stow
+    elif command -v pacman >/dev/null 2>&1; then
+        echo "Installing stow via pacman (requires sudo)..."
+        sudo pacman -S --noconfirm stow
+    elif command -v brew >/dev/null 2>&1; then
+        echo "Installing stow via brew..."
+        brew install stow
+    else
+        echo "No supported package manager found (looked for apt-get/dnf/pacman/brew)." >&2
+        echo "Install GNU Stow manually and re-run this script." >&2
+        return 1
+    fi
+}
+
+# Move any pre-existing real file out of the way so stow doesn't refuse
+# to link over it. Files already symlinked to this repo are left alone.
+backup_conflicts() {
+    local file rel target
+    while IFS= read -r -d '' file; do
+        rel="${file#"$pkg_dir"/}"
+        target="$HOME/$rel"
+        if [ -L "$target" ]; then
+            if [ "$(readlink -f "$target")" = "$(readlink -f "$file")" ]; then
+                continue
+            fi
+        fi
+        if [ -e "$target" ] || [ -L "$target" ]; then
+            mkdir -p "$(dirname "$backup_dir/$rel")"
+            echo "Backing up existing $target -> $backup_dir/$rel"
+            mv "$target" "$backup_dir/$rel"
+        fi
+    done < <(find "$pkg_dir" -type f -print0)
+}
+
+link_with_stow() {
+    backup_conflicts
+    stow -d "$repo_dir" -t "$HOME" home
+    echo "Linked home/ into \$HOME via stow."
+}
+
+copy_fallback() {
+    echo "Git Bash detected - copying files instead of symlinking."
+    local file rel target
+    while IFS= read -r -d '' file; do
+        rel="${file#"$pkg_dir"/}"
+        target="$HOME/$rel"
+        mkdir -p "$(dirname "$target")"
+        cp "$file" "$target"
+    done < <(find "$pkg_dir" -type f -print0)
+}
+
+if is_git_bash; then
+    copy_fallback
+elif install_stow; then
+    link_with_stow
+else
+    echo "Falling back to copying files instead of symlinking." >&2
+    copy_fallback
 fi
 
-cd .vim/colors
-curl -O https://raw.githubusercontent.com/morhetz/gruvbox/master/colors/gruvbox.vim
+# vim colorscheme (single file, not worth tracking in the repo itself)
+mkdir -p "$HOME/.vim/colors"
+curl -sfL -o "$HOME/.vim/colors/gruvbox.vim" \
+    https://raw.githubusercontent.com/morhetz/gruvbox/master/colors/gruvbox.vim
 
+# Machine-specific override files - not tracked, created empty/templated
+# if they don't already exist so .bashrc/.profile/.gitconfig don't error
+# sourcing/including them.
+touch "$HOME/.bashrc.local" "$HOME/.profile.local"
 
-# copy over dot files
-cd $dir
-# cp .bashrc ~/.bashrc
-cp .bash_aliases ~/.bash_aliases
-cp .gitconfig ~/.gitconfig
-cp .vimrc ~/.vimrc
-
-# change diff/merge tool to work with beyond compare 3 properly in linux
-if [ "$1" = "nix" ]; then
-  # pull down tmux setup if it doesn't exist
-  if [ ! -f "~/.tmux.conf" ]; then
-    echo ".tmux.conf does not exist, pulling down config"
-    cd ~
-    git clone https://github.com/gpakosz/.tmux.git
-    ln -s -f .tmux/.tmux.conf
-    cp .tmux/.tmux.conf.local .
-  fi
-
-  git config --global core.editor vim
-  git config --global diff.tool bc3
-  git config --global --unset difftool.bc3.path
-  git config --global difftool.bc3.trustExitCode true
-  git config --global merge.tool bc3
-  git config --global --unset mergetool.bc3.path
-  git config --global mergetool.bc3.trustExitCode true
+if [ ! -f "$HOME/.gitconfig.local" ]; then
+    cat > "$HOME/.gitconfig.local" <<'EOF'
+[user]
+	# Replace with this machine's GPG signing subkey ID
+	# (gpg --list-secret-keys --keyid-format=long)
+	signingkey = REPLACE_WITH_SIGNING_SUBKEY_ID
+EOF
+    echo "Created $HOME/.gitconfig.local - edit it with this machine's signing subkey ID."
 fi
 
-# reload bashrc
-. ~/.bashrc
+echo "Setup complete."
